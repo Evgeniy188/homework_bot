@@ -38,13 +38,11 @@ logger.addHandler(handler)
 
 
 def check_tokens() -> bool:
-
     """
     Проверяет доступность переменных окружения.
     Проверка токенов Практикума и
     Bot API, id чата получателя. Возвращает булево значение.
     """
-
     if all((PRACTICUM_TOKEN, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID)):
         logger.info('Проверка переменных окружения прошла успешно')
         return True
@@ -60,13 +58,11 @@ def check_tokens() -> bool:
 
 
 def send_message(bot: TeleBot, message: str) -> None:
-
     """
     Отправляет сообщение в Telegram-чат.
     Принимает на вход два параметра:
     экземпляр класса TeleBot и строку с текстом сообщения.
     """
-
     try:
         bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message)
         logger.debug(f'Сообщение отправлено. {message}')
@@ -77,14 +73,12 @@ def send_message(bot: TeleBot, message: str) -> None:
 
 
 def get_api_answer(timestamp: int) -> dict:
-
     """
     Делает запрос к единственному эндпоинту API-сервиса.
     В качестве параметра в функцию передаётся временная метка.
     В случае успешного запроса должна вернуть ответ API, приведя его из
     формата JSON к типам данных Python.
     """
-
     try:
         homework_statuses = requests.get(ENDPOINT,
                                          headers=HEADERS,
@@ -101,13 +95,11 @@ def get_api_answer(timestamp: int) -> dict:
 
 
 def check_response(response: dict) -> list:
-
     """
     Проверяет ответ API на соответствие документации.
     В качестве параметра функция получает ответ API,
     приведённый к типам данных Python.
     """
-
     if isinstance(response, dict):
         try:
             homeworks = response['homeworks']
@@ -127,7 +119,6 @@ def check_response(response: dict) -> list:
 
 
 def parse_status(homework: dict) -> str:
-
     """
     Извлекает из информации о конкретной домашней работе статус этой работы.
     В качестве параметра функция получает только один элемент
@@ -135,7 +126,6 @@ def parse_status(homework: dict) -> str:
     подготовленную для отправки в Telegram строку, содержащую один из
     вердиктов словаря HOMEWORK_VERDICTS
     """
-
     try:
         homework_name = homework['homework_name']
 
@@ -156,9 +146,7 @@ def parse_status(homework: dict) -> str:
 
 
 def main():
-
     """Основная логика работы бота."""
-
     if not check_tokens():
         return None
 
