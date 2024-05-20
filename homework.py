@@ -5,7 +5,7 @@ import requests
 import time
 
 from dotenv import load_dotenv
-from telebot import TeleBot, types
+from telebot import TeleBot
 
 
 load_dotenv()
@@ -38,6 +38,7 @@ logger.addHandler(handler)
 
 
 def check_tokens() -> bool:
+
     """
     Проверяет доступность переменных окружения.
     Проверка токенов Практикума и
@@ -59,9 +60,10 @@ def check_tokens() -> bool:
 
 
 def send_message(bot: TeleBot, message: str) -> None:
+
     """
-    Отправляет сообщение в Telegram-чат, определяемый переменной окружения
-    TELEGRAM_CHAT_ID. Принимает на вход два параметра:
+    Отправляет сообщение в Telegram-чат.
+    Принимает на вход два параметра:
     экземпляр класса TeleBot и строку с текстом сообщения.
     """
 
@@ -75,12 +77,14 @@ def send_message(bot: TeleBot, message: str) -> None:
 
 
 def get_api_answer(timestamp: int) -> dict:
+
     """
     Делает запрос к единственному эндпоинту API-сервиса.
     В качестве параметра в функцию передаётся временная метка.
     В случае успешного запроса должна вернуть ответ API, приведя его из
     формата JSON к типам данных Python.
     """
+
     try:
         homework_statuses = requests.get(ENDPOINT,
                                          headers=HEADERS,
@@ -97,9 +101,9 @@ def get_api_answer(timestamp: int) -> dict:
 
 
 def check_response(response: dict) -> list:
+
     """
-    Проверяет ответ API на соответствие документации из урока
-    «API сервиса Практикум Домашка».
+    Проверяет ответ API на соответствие документации.
     В качестве параметра функция получает ответ API,
     приведённый к типам данных Python.
     """
@@ -123,6 +127,7 @@ def check_response(response: dict) -> list:
 
 
 def parse_status(homework: dict) -> str:
+
     """
     Извлекает из информации о конкретной домашней работе статус этой работы.
     В качестве параметра функция получает только один элемент
@@ -151,6 +156,7 @@ def parse_status(homework: dict) -> str:
 
 
 def main():
+
     """Основная логика работы бота."""
 
     if not check_tokens():
