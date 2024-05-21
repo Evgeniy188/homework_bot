@@ -1,4 +1,3 @@
-from http import HTTPStatus
 import logging
 import os
 import requests
@@ -45,7 +44,7 @@ def check_tokens() -> bool:
     missng_tokens = [token for token in venv_tokens if not globals()[token]]
     if missng_tokens:
         logger.critical(
-            f'Необходимо указать переменные окружения: {", ".join(missng_tokens)}'
+            f'Отсутсвуют переменные окружения: {", ".join(missng_tokens)}'
         )
         raise ValueError
     return True
@@ -139,7 +138,6 @@ def main():
     timestamp = int(time.time())
 
     last_message = ''
-    last_error = None
 
     while True:
         try:
