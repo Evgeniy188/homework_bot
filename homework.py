@@ -34,7 +34,7 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 
-def check_tokens() -> bool:
+def check_tokens() -> None:
     """
     Проверяет доступность переменных окружения.
     Проверка токенов Практикума и
@@ -47,7 +47,6 @@ def check_tokens() -> bool:
             f'Отсутсвуют переменные окружения: {", ".join(missng_tokens)}'
         )
         raise ValueError
-    return True
 
 
 def send_message(bot: TeleBot, message: str) -> None:
@@ -79,7 +78,7 @@ def get_api_answer(timestamp: int) -> dict:
         raise ConnectionError(message)
 
     if homework_statuses.status_code != HTTPStatus.OK:
-        raise Exception(
+        raise ValueError(
             f'Ошибка при запросе к API: {homework_statuses.status_code}')
 
     return homework_statuses.json()
@@ -93,13 +92,12 @@ def check_response(response: dict) -> None:
     """
     logger.debug('Проверяем ответ API')
     if not isinstance(response, dict):
-        raise TypeError('Ответ не содержит словарь')
+        raise TypeError(f'Ответ не содержит словарь {type(response)}')
     homeworks = response.get('homeworks')
     if not homeworks:
-        message = 'В ответе отсутсвует ключ "homeworks"'
-        raise KeyError(message)
+        raise KeyError('В ответе отсутсвует ключ "homeworks"')
     if not isinstance(homeworks, list):
-        raise TypeError('Ответ не содержит домашних работ')
+        raise TypeError(f'Ответ не содержит словарь {type(response)}')
 
 
 def parse_status(homework: dict) -> str:
@@ -116,15 +114,15 @@ def parse_status(homework: dict) -> str:
 
     except KeyError as error:
         message = f'Ключ {error} отсутсвует в домашней работе'
-        logger.error(message)
         raise KeyError(message)
 
+    if not homework.get('status'):
+        raise ValueError('Ключ "status" отсутсвует в домашней работе')
     try:
         verdict = HOMEWORK_VERDICTS[homework['status']]
 
     except KeyError as error:
         message = f'{error}. Неизвестный статус домашней работы'
-        logger.error(message)
         raise KeyError(message)
 
     return f'Изменился статус проверки работы "{homework_name}". {verdict}'
@@ -150,21 +148,20 @@ def main():
                     send_message(bot, message)
                     last_message = message
             else:
-                logger.error('Отсутсвует обновление статуса домашней работы')
+                logger.info('Отсутсвует обновление статуса домашней работы')
 
             timestamp = homework_statuses.get('current_date', timestamp)
 
         except apihelper.ApiTelegramException as telegram_error:
-            message = f'Ошибка Telegram: {telegram_error}'
-            logger.error(message)
+            logger.error(f'Ошибка Telegram: {telegram_error}', exc_info=True)
 
         except Exception as error:
             message = f'Сбой в работе программы: {error}'
 
-            if str(error) != last_message:
+            if message != last_message:
                 with suppress(Exception):
                     send_message(bot, message)
-                    last_message = str(error)
+                    last_message = message
 
             logger.error(message, exc_info=True)
 
