@@ -43,7 +43,8 @@ def check_tokens() -> None:
     venv_tokens = ('PRACTICUM_TOKEN', 'TELEGRAM_TOKEN', 'TELEGRAM_CHAT_ID')
     missng_tokens = [token for token in venv_tokens if not globals()[token]]
     if missng_tokens:
-        message = f'Отсутсвуют переменные окружения: {", ".join(missng_tokens)}'
+        message = (
+            f'Отсутсвуют переменные окружения: {", ".join(missng_tokens)}')
         logger.critical(message)
         raise ValueError(message)
 
