@@ -1,11 +1,11 @@
 import logging
 import os
-import requests
 import sys
 import time
 from contextlib import suppress
 from http import HTTPStatus
 
+import requests
 from dotenv import load_dotenv
 from telebot import TeleBot, apihelper
 
@@ -43,10 +43,9 @@ def check_tokens() -> None:
     venv_tokens = ('PRACTICUM_TOKEN', 'TELEGRAM_TOKEN', 'TELEGRAM_CHAT_ID')
     missng_tokens = [token for token in venv_tokens if not globals()[token]]
     if missng_tokens:
-        logger.critical(
-            f'Отсутсвуют переменные окружения: {", ".join(missng_tokens)}'
-        )
-        raise ValueError
+        message = f'Отсутсвуют переменные окружения: {", ".join(missng_tokens)}'
+        logger.critical(message)
+        raise ValueError(message)
 
 
 def send_message(bot: TeleBot, message: str) -> None:
@@ -117,13 +116,13 @@ def parse_status(homework: dict) -> str:
         raise KeyError(message)
 
     if not homework.get('status'):
-        raise ValueError('Ключ "status" отсутсвует в домашней работе')
+        raise KeyError('Ключ "status" отсутсвует в домашней работе')
     try:
         verdict = HOMEWORK_VERDICTS[homework['status']]
 
     except KeyError as error:
         message = f'{error}. Неизвестный статус домашней работы'
-        raise KeyError(message)
+        raise ValueError(message)
 
     return f'Изменился статус проверки работы "{homework_name}". {verdict}'
 
